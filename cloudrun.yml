@@ -1,0 +1,17 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: PubliCar
+  namespace: default
+spec:
+  template:
+    spec:
+      containers:
+        - image: gcr.io/PROJECT_ID/tracking-api
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ENV
+              value: production
+            - name: DB_URL
+              value: # SUPABASE_POSTGRES_URL
