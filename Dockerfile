@@ -1,23 +1,23 @@
 # Stage 1
-FROM golang:1.23.4 as builder
+FROM golang:1.23.4-alpine3.21 AS builder
 
 WORKDIR /app
 
 COPY go.mod go.sum ./
 
-RUN go mod download
+RUN go mod download && go mod verify
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o server ./cmd/server/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /bin/server ./cmd/server/main.go
 
 # Stage 2
-FROM gcr.io/distroless/static-debian11
+FROM scratch
 
-WORKDIR /
+WORKDIR /app
 
-COPY --from=builder /app/server .
-
-ENTRYPOINT ["/server"]
+COPY --from=builder /bin/server /app/server
 
 EXPOSE 8080
+
+ENTRYPOINT ["/app/server"]
