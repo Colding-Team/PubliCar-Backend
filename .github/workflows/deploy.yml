@@ -38,12 +38,19 @@ jobs:
         id: vars
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
-      - name: Build and push to registries
+      - name: Build and push images
         run: |
-          docker build -t ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }} .
-          docker tag ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }} gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }}
-          docker push ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }}
-          docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }}
+          SHA_TAG=${{ steps.vars.outputs.sha_short }}
+          DH_IMAGE=${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
+          GCR_IMAGE=gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}
+
+          docker build -t $DH_IMAGE:$SHA_TAG -t $DH_IMAGE:latest -t $GCR_IMAGE:$SHA_TAG -t $GCR_IMAGE:latest .
+
+          docker push $DH_IMAGE:$SHA_TAG
+          docker push $DH_IMAGE:latest
+
+          docker push $GCR_IMAGE:$SHA_TAG
+          docker push $GCR_IMAGE:latest
 
       # - name: Deploy to Cloud Run
       #   uses: google-github-actions/deploy-cloudrun@v2
