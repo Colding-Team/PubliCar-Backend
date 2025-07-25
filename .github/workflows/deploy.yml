@@ -44,13 +44,16 @@ jobs:
           DH_IMAGE=${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
           GCR_IMAGE=gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}
 
-          docker build -t $DH_IMAGE:$SHA_TAG -t $DH_IMAGE:latest -t $GCR_IMAGE:$SHA_TAG -t $GCR_IMAGE:latest .
+          docker build -t $DH_IMAGE:$SHA_TAG -t $DH_IMAGE:latest .
+
+          # build with gcr
+          # docker build -t $DH_IMAGE:$SHA_TAG -t $DH_IMAGE:latest -t $GCR_IMAGE:$SHA_TAG -t $GCR_IMAGE:latest .
 
           docker push $DH_IMAGE:$SHA_TAG
           docker push $DH_IMAGE:latest
 
-          docker push $GCR_IMAGE:$SHA_TAG
-          docker push $GCR_IMAGE:latest
+          # docker push $GCR_IMAGE:$SHA_TAG
+          # docker push $GCR_IMAGE:latest
 
       # - name: Deploy to Cloud Run
       #   uses: google-github-actions/deploy-cloudrun@v2
