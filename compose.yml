@@ -1,0 +1,33 @@
+services:
+  db:
+    image: ${DB_IMAGE}
+    container_name: ${DB_HOST}
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - ${DB_VOLUME}:/var/lib/postgresql/data
+    networks:
+      - publicar
+
+  pgadmin:
+    image: ${PGADMIN_IMAGE}
+    container_name: ${PGADMIN_HOST}
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "${PGADMIN_PORT}:80"
+    depends_on:
+      - db
+    volumes:
+      - ${PGADMIN_VOLUME}:/var/lib/pgadmin
+    networks:
+      - publicar
+
+networks:
+  publicar:
+    driver: bridge
