@@ -11,7 +11,7 @@ services:
     volumes:
       - ${DB_VOLUME}:/var/lib/postgresql/data
     networks:
-      - itaquera_plus
+      - publicar
 
   pgadmin:
     image: ${PGADMIN_IMAGE}
@@ -24,13 +24,10 @@ services:
     depends_on:
       - db
     volumes:
-      - pgadmin_data:/var/lib/pgadmin
+      - ${PGADMIN_VOLUME}:/var/lib/pgadmin
     networks:
-      - itaquera_plus
+      - publicar
 
 networks:
-  itaquera_plus:
+  publicar:
     driver: bridge
-
-volumes:
-  pgadmin_data:
