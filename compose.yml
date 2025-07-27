@@ -24,10 +24,13 @@ services:
     depends_on:
       - db
     volumes:
-      - ${PGADMIN_VOLUME}:/var/lib/pgadmin
+      - pgadmin_data:/var/lib/pgadmin
     networks:
       - publicar
 
 networks:
   publicar:
     driver: bridge
+
+volumes:
+  pgadmin_data:
