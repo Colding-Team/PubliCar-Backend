@@ -37,7 +37,7 @@ CREATE TABLE trips (
   start_photo_url TEXT,
   end_photo_url TEXT,
   created_at TIMESTAMPTZ DEFAULT now(),
-	completed_at TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ
 );
 
 -- Logs de localização durante a "corrida"

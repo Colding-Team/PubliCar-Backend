@@ -1,8 +1,10 @@
 version: "2"
-packages:
-  - name: db
-    path: db
-    queries: db/queries.sql
-    schema: db/migrations
-    engine: postgresql
-    emit_json_tags: true
+sql:
+  - schema: "schema.sql"
+    queries: "queries/"
+    engine: "postgresql"
+    gen:
+      go:
+        out: "../internal/db"
+        package: "db"
+        sql_package: "pgx/v5"
