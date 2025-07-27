@@ -30,8 +30,8 @@ jobs:
           docker run --rm -v ${{ github.workspace }}:/src -w /src sqlc/sqlc:v1.29.0 generate
 
       - name: Check for uncommitted changes
-  run: |
-    git diff --exit-code || (echo "sqlc generated code is out of sync" && exit 1)
+        run: |
+          git diff --exit-code || (echo "sqlc generated code is out of sync" && exit 1)
 
   deploy:
     runs-on: ubuntu-latest
