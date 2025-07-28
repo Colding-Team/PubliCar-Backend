@@ -1,0 +1,22 @@
+# .github/workflows/migrate.yml
+name: Run Migrations
+
+on:
+  workflow_dispatch: # dispara manualmente
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run database migrations
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}/db/migrations:/migrations \
+            migrate/migrate \
+            -path=/migrations \
+            -database "${{ secrets.DB_URL }}" \
+            up
