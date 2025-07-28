@@ -14,7 +14,7 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (name, email, role)
 VALUES ($1, $2, $3)
-RETURNING id, name, email, role, created_at
+RETURNING id, name, email, role, created_at, updated_at
 `
 
 type CreateUserParams struct {
@@ -32,6 +32,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Email,
 		&i.Role,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -47,7 +48,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id pgtype.UUID) error {
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, name, email, role, created_at FROM users
+SELECT id, name, email, role, created_at, updated_at FROM users
 WHERE email = $1
 `
 
@@ -60,12 +61,13 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.Email,
 		&i.Role,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, name, email, role, created_at FROM users
+SELECT id, name, email, role, created_at, updated_at FROM users
 WHERE id = $1
 `
 
@@ -78,12 +80,13 @@ func (q *Queries) GetUserByID(ctx context.Context, id pgtype.UUID) (User, error)
 		&i.Email,
 		&i.Role,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, name, email, role, created_at FROM users
+SELECT id, name, email, role, created_at, updated_at FROM users
 ORDER BY created_at DESC
 `
 
@@ -102,6 +105,7 @@ func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
 			&i.Email,
 			&i.Role,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -114,7 +118,7 @@ func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
 }
 
 const listUsersByRole = `-- name: ListUsersByRole :many
-SELECT id, name, email, role, created_at FROM users
+SELECT id, name, email, role, created_at, updated_at FROM users
 WHERE role = $1
 ORDER BY created_at DESC
 `
@@ -134,6 +138,7 @@ func (q *Queries) ListUsersByRole(ctx context.Context, role string) ([]User, err
 			&i.Email,
 			&i.Role,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -146,7 +151,7 @@ func (q *Queries) ListUsersByRole(ctx context.Context, role string) ([]User, err
 }
 
 const listUsersByRolePaginated = `-- name: ListUsersByRolePaginated :many
-SELECT id, name, email, role, created_at FROM users
+SELECT id, name, email, role, created_at, updated_at FROM users
 WHERE role = $1
 ORDER BY created_at DESC
 LIMIT $2 OFFSET $3
@@ -173,6 +178,7 @@ func (q *Queries) ListUsersByRolePaginated(ctx context.Context, arg ListUsersByR
 			&i.Email,
 			&i.Role,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -185,7 +191,7 @@ func (q *Queries) ListUsersByRolePaginated(ctx context.Context, arg ListUsersByR
 }
 
 const listUsersPaginated = `-- name: ListUsersPaginated :many
-SELECT id, name, email, role, created_at FROM users
+SELECT id, name, email, role, created_at, updated_at FROM users
 ORDER BY created_at DESC
 LIMIT $1 OFFSET $2
 `
@@ -210,6 +216,7 @@ func (q *Queries) ListUsersPaginated(ctx context.Context, arg ListUsersPaginated
 			&i.Email,
 			&i.Role,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}

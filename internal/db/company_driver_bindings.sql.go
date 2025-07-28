@@ -14,7 +14,7 @@ import (
 const createCompanyDriverBinding = `-- name: CreateCompanyDriverBinding :one
 INSERT INTO company_driver_bindings (company_id, driver_id, start_date, end_date)
 VALUES ($1, $2, $3, $4)
-RETURNING id, company_id, driver_id, start_date, end_date, created_at
+RETURNING id, company_id, driver_id, start_date, end_date, created_at, updated_at
 `
 
 type CreateCompanyDriverBindingParams struct {
@@ -39,6 +39,7 @@ func (q *Queries) CreateCompanyDriverBinding(ctx context.Context, arg CreateComp
 		&i.StartDate,
 		&i.EndDate,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -70,7 +71,7 @@ func (q *Queries) EndBinding(ctx context.Context, arg EndBindingParams) error {
 }
 
 const getActiveBindingByDriverID = `-- name: GetActiveBindingByDriverID :one
-SELECT id, company_id, driver_id, start_date, end_date, created_at FROM company_driver_bindings
+SELECT id, company_id, driver_id, start_date, end_date, created_at, updated_at FROM company_driver_bindings
 WHERE driver_id = $1
   AND end_date IS NULL
 ORDER BY start_date DESC
@@ -87,12 +88,13 @@ func (q *Queries) GetActiveBindingByDriverID(ctx context.Context, driverID pgtyp
 		&i.StartDate,
 		&i.EndDate,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getAllBindingsByCompanyID = `-- name: GetAllBindingsByCompanyID :many
-SELECT id, company_id, driver_id, start_date, end_date, created_at FROM company_driver_bindings
+SELECT id, company_id, driver_id, start_date, end_date, created_at, updated_at FROM company_driver_bindings
 WHERE company_id = $1
 ORDER BY start_date DESC
 `
@@ -113,6 +115,7 @@ func (q *Queries) GetAllBindingsByCompanyID(ctx context.Context, companyID pgtyp
 			&i.StartDate,
 			&i.EndDate,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -125,7 +128,7 @@ func (q *Queries) GetAllBindingsByCompanyID(ctx context.Context, companyID pgtyp
 }
 
 const getAllBindingsByDriverID = `-- name: GetAllBindingsByDriverID :many
-SELECT id, company_id, driver_id, start_date, end_date, created_at FROM company_driver_bindings
+SELECT id, company_id, driver_id, start_date, end_date, created_at, updated_at FROM company_driver_bindings
 WHERE driver_id = $1
 ORDER BY start_date DESC
 `
@@ -146,6 +149,7 @@ func (q *Queries) GetAllBindingsByDriverID(ctx context.Context, driverID pgtype.
 			&i.StartDate,
 			&i.EndDate,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -158,7 +162,7 @@ func (q *Queries) GetAllBindingsByDriverID(ctx context.Context, driverID pgtype.
 }
 
 const getBindingByID = `-- name: GetBindingByID :one
-SELECT id, company_id, driver_id, start_date, end_date, created_at FROM company_driver_bindings
+SELECT id, company_id, driver_id, start_date, end_date, created_at, updated_at FROM company_driver_bindings
 WHERE id = $1
 `
 
@@ -172,12 +176,13 @@ func (q *Queries) GetBindingByID(ctx context.Context, id pgtype.UUID) (CompanyDr
 		&i.StartDate,
 		&i.EndDate,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const listActiveBindings = `-- name: ListActiveBindings :many
-SELECT id, company_id, driver_id, start_date, end_date, created_at FROM company_driver_bindings
+SELECT id, company_id, driver_id, start_date, end_date, created_at, updated_at FROM company_driver_bindings
 WHERE end_date IS NULL
 ORDER BY created_at DESC
 LIMIT $1 OFFSET $2
@@ -204,6 +209,7 @@ func (q *Queries) ListActiveBindings(ctx context.Context, arg ListActiveBindings
 			&i.StartDate,
 			&i.EndDate,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -216,7 +222,7 @@ func (q *Queries) ListActiveBindings(ctx context.Context, arg ListActiveBindings
 }
 
 const listBindingsPaginated = `-- name: ListBindingsPaginated :many
-SELECT id, company_id, driver_id, start_date, end_date, created_at FROM company_driver_bindings
+SELECT id, company_id, driver_id, start_date, end_date, created_at, updated_at FROM company_driver_bindings
 ORDER BY created_at DESC
 LIMIT $1 OFFSET $2
 `
@@ -242,6 +248,7 @@ func (q *Queries) ListBindingsPaginated(ctx context.Context, arg ListBindingsPag
 			&i.StartDate,
 			&i.EndDate,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -254,7 +261,7 @@ func (q *Queries) ListBindingsPaginated(ctx context.Context, arg ListBindingsPag
 }
 
 const listFinishedBindings = `-- name: ListFinishedBindings :many
-SELECT id, company_id, driver_id, start_date, end_date, created_at FROM company_driver_bindings
+SELECT id, company_id, driver_id, start_date, end_date, created_at, updated_at FROM company_driver_bindings
 WHERE end_date IS NOT NULL
 ORDER BY end_date DESC
 LIMIT $1 OFFSET $2
@@ -281,6 +288,7 @@ func (q *Queries) ListFinishedBindings(ctx context.Context, arg ListFinishedBind
 			&i.StartDate,
 			&i.EndDate,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}

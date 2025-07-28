@@ -77,6 +77,7 @@ CREATE TABLE trip_photo_metadata (
   device_model TEXT,           -- opcional: modelo da câmera/dispositivo
   orientation TEXT,            -- opcional: orientação da imagem
   created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
 
   UNIQUE(trip_id, type) -- garante que só exista um registro por tipo/foto por trip
 );

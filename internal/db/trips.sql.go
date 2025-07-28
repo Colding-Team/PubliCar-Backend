@@ -45,7 +45,7 @@ INSERT INTO trips (
 driver_id, company_id, start_time, start_photo_url
 )
 VALUES ($1, $2, $3, $4)
-RETURNING id, driver_id, company_id, start_time, end_time, travelled_meters, start_photo_url, end_photo_url, created_at, completed_at
+RETURNING id, driver_id, company_id, start_time, end_time, travelled_meters, start_photo_url, end_photo_url, created_at, completed_at, updated_at
 `
 
 type CreateTripParams struct {
@@ -74,6 +74,7 @@ func (q *Queries) CreateTrip(ctx context.Context, arg CreateTripParams) (Trip, e
 		&i.EndPhotoUrl,
 		&i.CreatedAt,
 		&i.CompletedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -89,7 +90,7 @@ func (q *Queries) DeleteTrip(ctx context.Context, id pgtype.UUID) error {
 }
 
 const getOngoingTripByDriver = `-- name: GetOngoingTripByDriver :one
-SELECT id, driver_id, company_id, start_time, end_time, travelled_meters, start_photo_url, end_photo_url, created_at, completed_at FROM trips
+SELECT id, driver_id, company_id, start_time, end_time, travelled_meters, start_photo_url, end_photo_url, created_at, completed_at, updated_at FROM trips
 WHERE driver_id = $1
 AND end_time IS NULL
 ORDER BY start_time DESC
@@ -110,12 +111,13 @@ func (q *Queries) GetOngoingTripByDriver(ctx context.Context, driverID pgtype.UU
 		&i.EndPhotoUrl,
 		&i.CreatedAt,
 		&i.CompletedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getTripByID = `-- name: GetTripByID :one
-SELECT id, driver_id, company_id, start_time, end_time, travelled_meters, start_photo_url, end_photo_url, created_at, completed_at FROM trips
+SELECT id, driver_id, company_id, start_time, end_time, travelled_meters, start_photo_url, end_photo_url, created_at, completed_at, updated_at FROM trips
 WHERE id = $1
 `
 
@@ -133,12 +135,13 @@ func (q *Queries) GetTripByID(ctx context.Context, id pgtype.UUID) (Trip, error)
 		&i.EndPhotoUrl,
 		&i.CreatedAt,
 		&i.CompletedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const listTripsByCompany = `-- name: ListTripsByCompany :many
-SELECT id, driver_id, company_id, start_time, end_time, travelled_meters, start_photo_url, end_photo_url, created_at, completed_at FROM trips
+SELECT id, driver_id, company_id, start_time, end_time, travelled_meters, start_photo_url, end_photo_url, created_at, completed_at, updated_at FROM trips
 WHERE company_id = $1
 ORDER BY start_time DESC
 LIMIT $2 OFFSET $3
@@ -170,6 +173,7 @@ func (q *Queries) ListTripsByCompany(ctx context.Context, arg ListTripsByCompany
 			&i.EndPhotoUrl,
 			&i.CreatedAt,
 			&i.CompletedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -182,7 +186,7 @@ func (q *Queries) ListTripsByCompany(ctx context.Context, arg ListTripsByCompany
 }
 
 const listTripsByDriver = `-- name: ListTripsByDriver :many
-SELECT id, driver_id, company_id, start_time, end_time, travelled_meters, start_photo_url, end_photo_url, created_at, completed_at FROM trips
+SELECT id, driver_id, company_id, start_time, end_time, travelled_meters, start_photo_url, end_photo_url, created_at, completed_at, updated_at FROM trips
 WHERE driver_id = $1
 ORDER BY start_time DESC
 LIMIT $2 OFFSET $3
@@ -214,6 +218,7 @@ func (q *Queries) ListTripsByDriver(ctx context.Context, arg ListTripsByDriverPa
 			&i.EndPhotoUrl,
 			&i.CreatedAt,
 			&i.CompletedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -226,7 +231,7 @@ func (q *Queries) ListTripsByDriver(ctx context.Context, arg ListTripsByDriverPa
 }
 
 const listTripsByPeriod = `-- name: ListTripsByPeriod :many
-SELECT id, driver_id, company_id, start_time, end_time, travelled_meters, start_photo_url, end_photo_url, created_at, completed_at FROM trips
+SELECT id, driver_id, company_id, start_time, end_time, travelled_meters, start_photo_url, end_photo_url, created_at, completed_at, updated_at FROM trips
 WHERE driver_id = $1
 AND start_time >= $2
 AND end_time <= $3
@@ -259,6 +264,7 @@ func (q *Queries) ListTripsByPeriod(ctx context.Context, arg ListTripsByPeriodPa
 			&i.EndPhotoUrl,
 			&i.CreatedAt,
 			&i.CompletedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}

@@ -21,7 +21,7 @@ INSERT INTO payments (
 ) VALUES (
   $1, $2, $3, $4, $5
 )
-RETURNING id, trip_id, driver_id, amount, status, paid_at, created_at
+RETURNING id, trip_id, driver_id, amount, status, paid_at, created_at, updated_at
 `
 
 type CreatePaymentParams struct {
@@ -49,6 +49,7 @@ func (q *Queries) CreatePayment(ctx context.Context, arg CreatePaymentParams) (P
 		&i.Status,
 		&i.PaidAt,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -64,7 +65,7 @@ func (q *Queries) DeletePayment(ctx context.Context, id pgtype.UUID) error {
 }
 
 const getPaymentByID = `-- name: GetPaymentByID :one
-SELECT id, trip_id, driver_id, amount, status, paid_at, created_at FROM payments
+SELECT id, trip_id, driver_id, amount, status, paid_at, created_at, updated_at FROM payments
 WHERE id = $1
 `
 
@@ -79,12 +80,13 @@ func (q *Queries) GetPaymentByID(ctx context.Context, id pgtype.UUID) (Payment, 
 		&i.Status,
 		&i.PaidAt,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const listPayments = `-- name: ListPayments :many
-SELECT id, trip_id, driver_id, amount, status, paid_at, created_at FROM payments
+SELECT id, trip_id, driver_id, amount, status, paid_at, created_at, updated_at FROM payments
 ORDER BY created_at DESC
 LIMIT $1 OFFSET $2
 `
@@ -111,6 +113,7 @@ func (q *Queries) ListPayments(ctx context.Context, arg ListPaymentsParams) ([]P
 			&i.Status,
 			&i.PaidAt,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -123,7 +126,7 @@ func (q *Queries) ListPayments(ctx context.Context, arg ListPaymentsParams) ([]P
 }
 
 const listPaymentsByDriver = `-- name: ListPaymentsByDriver :many
-SELECT id, trip_id, driver_id, amount, status, paid_at, created_at FROM payments
+SELECT id, trip_id, driver_id, amount, status, paid_at, created_at, updated_at FROM payments
 WHERE driver_id = $1
 ORDER BY created_at DESC
 LIMIT $2 OFFSET $3
@@ -152,6 +155,7 @@ func (q *Queries) ListPaymentsByDriver(ctx context.Context, arg ListPaymentsByDr
 			&i.Status,
 			&i.PaidAt,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -164,7 +168,7 @@ func (q *Queries) ListPaymentsByDriver(ctx context.Context, arg ListPaymentsByDr
 }
 
 const listPaymentsByTrip = `-- name: ListPaymentsByTrip :many
-SELECT id, trip_id, driver_id, amount, status, paid_at, created_at FROM payments
+SELECT id, trip_id, driver_id, amount, status, paid_at, created_at, updated_at FROM payments
 WHERE trip_id = $1
 `
 
@@ -185,6 +189,7 @@ func (q *Queries) ListPaymentsByTrip(ctx context.Context, tripID pgtype.UUID) ([
 			&i.Status,
 			&i.PaidAt,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}

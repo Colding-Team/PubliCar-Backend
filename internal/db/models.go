@@ -14,6 +14,7 @@ type Company struct {
 	Cnpj         string
 	ContactEmail pgtype.Text
 	CreatedAt    pgtype.Timestamptz
+	UpdatedAt    pgtype.Timestamptz
 }
 
 type CompanyDriverBinding struct {
@@ -23,6 +24,7 @@ type CompanyDriverBinding struct {
 	StartDate pgtype.Date
 	EndDate   pgtype.Date
 	CreatedAt pgtype.Timestamptz
+	UpdatedAt pgtype.Timestamptz
 }
 
 type Payment struct {
@@ -33,6 +35,7 @@ type Payment struct {
 	Status    string
 	PaidAt    pgtype.Timestamptz
 	CreatedAt pgtype.Timestamptz
+	UpdatedAt pgtype.Timestamptz
 }
 
 type Trip struct {
@@ -46,6 +49,7 @@ type Trip struct {
 	EndPhotoUrl     pgtype.Text
 	CreatedAt       pgtype.Timestamptz
 	CompletedAt     pgtype.Timestamptz
+	UpdatedAt       pgtype.Timestamptz
 }
 
 type TripLocation struct {
@@ -54,6 +58,20 @@ type TripLocation struct {
 	Lat       float64
 	Lng       float64
 	Timestamp pgtype.Timestamptz
+	UpdatedAt pgtype.Timestamptz
+}
+
+type TripPhotoMetadatum struct {
+	ID          pgtype.UUID
+	TripID      pgtype.UUID
+	Type        string
+	TakenAt     pgtype.Timestamptz
+	Lat         pgtype.Float8
+	Lng         pgtype.Float8
+	DeviceModel pgtype.Text
+	Orientation pgtype.Text
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
 }
 
 type User struct {
@@ -62,4 +80,5 @@ type User struct {
 	Email     string
 	Role      string
 	CreatedAt pgtype.Timestamptz
+	UpdatedAt pgtype.Timestamptz
 }

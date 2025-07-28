@@ -70,6 +70,7 @@ CREATE TABLE trip_photo_metadata (
   device_model TEXT,
   orientation TEXT,
   created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now(),
 
   UNIQUE(trip_id, type)
 );

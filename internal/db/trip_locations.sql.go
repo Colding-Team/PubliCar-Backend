@@ -14,7 +14,7 @@ import (
 const createTripLocation = `-- name: CreateTripLocation :one
 INSERT INTO trip_locations (trip_id, lat, lng, timestamp)
 VALUES ($1, $2, $3, $4)
-RETURNING id, trip_id, lat, lng, timestamp
+RETURNING id, trip_id, lat, lng, timestamp, updated_at
 `
 
 type CreateTripLocationParams struct {
@@ -38,6 +38,7 @@ func (q *Queries) CreateTripLocation(ctx context.Context, arg CreateTripLocation
 		&i.Lat,
 		&i.Lng,
 		&i.Timestamp,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -63,7 +64,7 @@ func (q *Queries) DeleteTripLocationsByTripID(ctx context.Context, tripID pgtype
 }
 
 const getTripLocationByID = `-- name: GetTripLocationByID :one
-SELECT id, trip_id, lat, lng, timestamp FROM trip_locations
+SELECT id, trip_id, lat, lng, timestamp, updated_at FROM trip_locations
 WHERE id = $1
 `
 
@@ -76,12 +77,13 @@ func (q *Queries) GetTripLocationByID(ctx context.Context, id pgtype.UUID) (Trip
 		&i.Lat,
 		&i.Lng,
 		&i.Timestamp,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const listTripLocationsByTripID = `-- name: ListTripLocationsByTripID :many
-SELECT id, trip_id, lat, lng, timestamp FROM trip_locations
+SELECT id, trip_id, lat, lng, timestamp, updated_at FROM trip_locations
 WHERE trip_id = $1
 ORDER BY timestamp ASC
 `
@@ -101,6 +103,7 @@ func (q *Queries) ListTripLocationsByTripID(ctx context.Context, tripID pgtype.U
 			&i.Lat,
 			&i.Lng,
 			&i.Timestamp,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -113,7 +116,7 @@ func (q *Queries) ListTripLocationsByTripID(ctx context.Context, tripID pgtype.U
 }
 
 const listTripLocationsByTripIDWithPagination = `-- name: ListTripLocationsByTripIDWithPagination :many
-SELECT id, trip_id, lat, lng, timestamp FROM trip_locations
+SELECT id, trip_id, lat, lng, timestamp, updated_at FROM trip_locations
 WHERE trip_id = $1
 ORDER BY timestamp ASC
 LIMIT $2 OFFSET $3
@@ -140,6 +143,7 @@ func (q *Queries) ListTripLocationsByTripIDWithPagination(ctx context.Context, a
 			&i.Lat,
 			&i.Lng,
 			&i.Timestamp,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}

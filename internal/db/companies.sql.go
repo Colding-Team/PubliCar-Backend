@@ -14,7 +14,7 @@ import (
 const createCompany = `-- name: CreateCompany :one
 INSERT INTO companies (name, cnpj, contact_email)
 VALUES ($1, $2, $3)
-RETURNING id, name, cnpj, contact_email, created_at
+RETURNING id, name, cnpj, contact_email, created_at, updated_at
 `
 
 type CreateCompanyParams struct {
@@ -32,6 +32,7 @@ func (q *Queries) CreateCompany(ctx context.Context, arg CreateCompanyParams) (C
 		&i.Cnpj,
 		&i.ContactEmail,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -47,7 +48,7 @@ func (q *Queries) DeleteCompany(ctx context.Context, id pgtype.UUID) error {
 }
 
 const getCompanyByCNPJ = `-- name: GetCompanyByCNPJ :one
-SELECT id, name, cnpj, contact_email, created_at FROM companies
+SELECT id, name, cnpj, contact_email, created_at, updated_at FROM companies
 WHERE cnpj = $1
 `
 
@@ -60,12 +61,13 @@ func (q *Queries) GetCompanyByCNPJ(ctx context.Context, cnpj string) (Company, e
 		&i.Cnpj,
 		&i.ContactEmail,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getCompanyByID = `-- name: GetCompanyByID :one
-SELECT id, name, cnpj, contact_email, created_at FROM companies
+SELECT id, name, cnpj, contact_email, created_at, updated_at FROM companies
 WHERE id = $1
 `
 
@@ -78,12 +80,13 @@ func (q *Queries) GetCompanyByID(ctx context.Context, id pgtype.UUID) (Company, 
 		&i.Cnpj,
 		&i.ContactEmail,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const listCompanies = `-- name: ListCompanies :many
-SELECT id, name, cnpj, contact_email, created_at FROM companies
+SELECT id, name, cnpj, contact_email, created_at, updated_at FROM companies
 ORDER BY created_at DESC
 `
 
@@ -102,6 +105,7 @@ func (q *Queries) ListCompanies(ctx context.Context) ([]Company, error) {
 			&i.Cnpj,
 			&i.ContactEmail,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -114,7 +118,7 @@ func (q *Queries) ListCompanies(ctx context.Context) ([]Company, error) {
 }
 
 const listCompaniesPaginated = `-- name: ListCompaniesPaginated :many
-SELECT id, name, cnpj, contact_email, created_at FROM companies
+SELECT id, name, cnpj, contact_email, created_at, updated_at FROM companies
 ORDER BY created_at DESC
 LIMIT $1 OFFSET $2
 `
@@ -139,6 +143,7 @@ func (q *Queries) ListCompaniesPaginated(ctx context.Context, arg ListCompaniesP
 			&i.Cnpj,
 			&i.ContactEmail,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -151,7 +156,7 @@ func (q *Queries) ListCompaniesPaginated(ctx context.Context, arg ListCompaniesP
 }
 
 const searchCompaniesByName = `-- name: SearchCompaniesByName :many
-SELECT id, name, cnpj, contact_email, created_at FROM companies
+SELECT id, name, cnpj, contact_email, created_at, updated_at FROM companies
 WHERE name ILIKE '%' || $1 || '%'
 ORDER BY created_at DESC
 `
@@ -171,6 +176,7 @@ func (q *Queries) SearchCompaniesByName(ctx context.Context, dollar_1 pgtype.Tex
 			&i.Cnpj,
 			&i.ContactEmail,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
