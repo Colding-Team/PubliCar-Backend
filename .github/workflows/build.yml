@@ -2,28 +2,43 @@ name: Deploy to Cloud Run
 
 on:
   push:
-    branches:
-      - main
+    branches: ["**"]
 
 env:
   SERVICE: PubliCar
-  # REGION: # TODO
-  # PROJECT_ID: # TODO
   DOCKERHUB_USERNAME: paulooo
   IMAGE_NAME: publicar-backend
 
 jobs:
+  sqlc:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.23.4
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Generate SQLC code using Docker
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/src -w /src sqlc/sqlc:1.29.0 generate -f db/sqlc.yml
+
+      - name: Check for uncommitted changes
+        run: |
+          git diff --exit-code || (echo "sqlc generated code is out of sync" && exit 1)
+
   deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      # - name: Set up Google Cloud
-      #   uses: google-github-actions/auth@v2
-      #   with:
-      #     credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -45,19 +60,5 @@ jobs:
           GCR_IMAGE=gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}
 
           docker build -t $DH_IMAGE:$SHA_TAG -t $DH_IMAGE:latest .
-
-          # build with gcr
-          # docker build -t $DH_IMAGE:$SHA_TAG -t $DH_IMAGE:latest -t $GCR_IMAGE:$SHA_TAG -t $GCR_IMAGE:latest .
-
           docker push $DH_IMAGE:$SHA_TAG
           docker push $DH_IMAGE:latest
-
-          # docker push $GCR_IMAGE:$SHA_TAG
-          # docker push $GCR_IMAGE:latest
-
-      # - name: Deploy to Cloud Run
-      #   uses: google-github-actions/deploy-cloudrun@v2
-      #   with:
-      #     service: ${{ env.SERVICE }}
-      #     region: ${{ env.REGION }}
-      #     image: gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }}
