@@ -25,14 +25,14 @@ jobs:
       - name: Download dependencies
         run: go mod download
 
-      - name: Run database migrations first
-        run: |
-          docker run --rm \
-            -v ${{ github.workspace }}/db/migrations:/migrations \
-            migrate/migrate \
-            -path=/migrations \
-            -database "${{ secrets.DB_URL }}" \
-            up
+      # - name: Run database migrations first
+      #   run: |
+      #     docker run --rm \
+      #       -v ${{ github.workspace }}/db/migrations:/migrations \
+      #       migrate/migrate \
+      #       -path=/migrations \
+      #       -database "${{ secrets.DB_URL }}" \
+      #       up
 
       - name: Generate SQLC code using Docker
         run: |
