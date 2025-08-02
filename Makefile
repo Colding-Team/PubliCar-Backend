@@ -49,71 +49,53 @@ migrate-create:
 		create -ext sql -dir /migrations -seq $(NAME)
 
 # Production migration commands (for external databases)
-# Note: Migrations should use direct connection, not pooling
 migrate-up-prod:
-	docker run --rm \
-		--add-host=host.docker.internal:host-gateway \
-		-v $(PWD)/db/migrations:/migrations migrate/migrate \
-		-path=/migrations \
-		-database "$(PROD_DIRECT_URL)" up
-
-migrate-down-prod:
-	docker run --rm \
-		--add-host=host.docker.internal:host-gateway \
-		-v $(PWD)/db/migrations:/migrations migrate/migrate \
-		-path=/migrations \
-		-database "$(PROD_DIRECT_URL)" down -all
-
-migrate-version-prod:
-	docker run --rm \
-		--add-host=host.docker.internal:host-gateway \
-		-v $(PWD)/db/migrations:/migrations migrate/migrate \
-		-path=/migrations \
-		-database "$(PROD_DIRECT_URL)" version
-
-# Supabase-specific migration commands (alternative approach)
-migrate-up-supabase:
 	docker run --rm \
 		--network host \
 		-v $(PWD)/db/migrations:/migrations migrate/migrate \
 		-path=/migrations \
 		-database "$(PROD_DB_URL)" up
 
-migrate-down-supabase:
+migrate-down-prod:
 	docker run --rm \
 		--network host \
 		-v $(PWD)/db/migrations:/migrations migrate/migrate \
 		-path=/migrations \
 		-database "$(PROD_DB_URL)" down -all
 
-migrate-version-supabase:
+migrate-version-prod:
 	docker run --rm \
 		--network host \
 		-v $(PWD)/db/migrations:/migrations migrate/migrate \
 		-path=/migrations \
 		-database "$(PROD_DB_URL)" version
 
-# Local migration commands (requires migrate tool installed locally)
-migrate-up-local:
-	migrate -path db/migrations -database "$(PROD_DIRECT_URL)" up
-
-migrate-down-local:
-	migrate -path db/migrations -database "$(PROD_DIRECT_URL)" down -all
-
-migrate-version-local:
-	migrate -path db/migrations -database "$(PROD_DIRECT_URL)" version
-
 # Code generation
 sqlc-docker:
 	docker run --rm -v $(PWD):/src -w /src sqlc/sqlc:1.29.0 generate -f db/sqlc.yml
 
-# Connection testing commands
-test-direct-connection:
-	@echo "Testing direct connection..."
-	@docker run --rm ${DB_IMAGE} psql "$(PROD_DIRECT_URL)" -c "SELECT version();"
+# Database schema export
+schema-dump:
+	docker run --rm \
+		--network=publicar-backend_publicar \
+		-e PGPASSWORD=dev \
+		${DB_IMAGE} \
+		pg_dump ${DB_URL} \
+		--schema-only --no-owner --no-privileges \
+		> db/schema.sql
 
-test-pooled-connection:
-	@echo "Testing pooled connection..."
+schema-dump-prod:
+	@echo "Exporting schema from production database..."
+	@docker run --rm \
+		${DB_IMAGE} \
+		pg_dump "$(PROD_DB_URL)" \
+		--schema-only --no-owner --no-privileges \
+		> db/schema.sql
+	@echo "Schema exported to db/schema.sql"
+
+# Connection testing commands
+test-prod-connection:
+	@echo "Testing production connection..."
 	@docker run --rm ${DB_IMAGE} psql "$(PROD_DB_URL)" -c "SELECT version();"
 
 # Development workflow
@@ -143,6 +125,13 @@ db-reset:
 		-database "${DB_URL}" up
 	@echo "Database reset and migrations applied successfully!"
 
+# Complete migration and SQLC sync workflow
+migrate-sync: migrate-up schema-dump sqlc-docker
+	@echo "✅ Migration and SQLC sync completed successfully!"
+
+migrate-sync-prod: migrate-up-prod schema-dump-prod sqlc-docker
+	@echo "✅ Production migration and SQLC sync completed successfully!"
+
 # Help
 help:
 	@echo "Available commands:"
@@ -162,11 +151,18 @@ help:
 	@echo "  migrate-up-prod  - Apply migrations to production (PROD_DB_URL required)"
 	@echo "  migrate-down-prod- Rollback production migrations (PROD_DB_URL required)"
 	@echo "  migrate-version-prod - Show production migration version"
-	@echo "  migrate-up-supabase - Apply migrations to Supabase (alternative network config)"
-	@echo "  migrate-up-local   - Apply migrations locally (requires migrate tool)"
+	@echo "  test-prod-connection - Test production database connection"
 	@echo ""
 	@echo "Development workflow:"
 	@echo "  dev-setup        - Setup development environment"
 	@echo "  dev-reset        - Reset database and reapply migrations"
 	@echo "  db-reset         - Complete database reset (force reset + apply all migrations)"
-	@echo "  sqlc             - Generate SQL code"
+	@echo "  sqlc-docker      - Generate SQL code using Docker"
+	@echo ""
+	@echo "Migration sync workflow:"
+	@echo "  migrate-sync     - Apply migrations + export schema + generate SQLC (dev)"
+	@echo "  migrate-sync-prod- Apply migrations + export schema + generate SQLC (prod)"
+	@echo ""
+	@echo "Schema export:"
+	@echo "  schema-dump      - Export schema from development database"
+	@echo "  schema-dump-prod - Export schema from production database"

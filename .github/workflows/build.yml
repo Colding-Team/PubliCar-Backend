@@ -27,7 +27,7 @@ jobs:
 
       - name: Generate SQLC code using Docker
         run: |
-          docker run --rm -v ${{ github.workspace }}:/src -w /src sqlc/sqlc:1.29.0 generate -f db/sqlc.yml --no-verify
+          docker run --rm -v ${{ github.workspace }}:/src -w /src sqlc/sqlc:1.29.0 generate -f db/sqlc.yml
 
       - name: Check for uncommitted changes
         run: |
@@ -57,7 +57,6 @@ jobs:
         run: |
           SHA_TAG=${{ steps.vars.outputs.sha_short }}
           DH_IMAGE=${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
-          GCR_IMAGE=gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}
 
           docker build -t $DH_IMAGE:$SHA_TAG -t $DH_IMAGE:latest .
           docker push $DH_IMAGE:$SHA_TAG
