@@ -104,8 +104,8 @@ migrate-version-local:
 	migrate -path db/migrations -database "$(PROD_DIRECT_URL)" version
 
 # Code generation
-sqlc:
-	sqlc generate --file db/sqlc.yml
+sqlc-docker:
+	docker run --rm -v $(PWD):/src -w /src sqlc/sqlc:1.29.0 generate -f db/sqlc.yml
 
 # Connection testing commands
 test-direct-connection:
