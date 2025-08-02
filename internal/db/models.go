@@ -38,6 +38,11 @@ type Payment struct {
 	UpdatedAt pgtype.Timestamptz
 }
 
+type SchemaMigration struct {
+	Version int64
+	Dirty   bool
+}
+
 type Trip struct {
 	ID              pgtype.UUID
 	DriverID        pgtype.UUID
@@ -75,10 +80,11 @@ type TripPhotoMetadatum struct {
 }
 
 type User struct {
-	ID        pgtype.UUID
-	Name      string
-	Email     string
-	Role      string
-	CreatedAt pgtype.Timestamptz
-	UpdatedAt pgtype.Timestamptz
+	ID           pgtype.UUID
+	Name         string
+	Email        string
+	Role         string
+	CreatedAt    pgtype.Timestamptz
+	UpdatedAt    pgtype.Timestamptz
+	PasswordHash pgtype.Text
 }

@@ -162,13 +162,6 @@ CREATE TABLE public.users (
 
 
 --
--- Name: COLUMN users.password_hash; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN public.users.password_hash IS 'Hashed password for user authentication';
-
-
---
 -- Name: companies companies_cnpj_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
