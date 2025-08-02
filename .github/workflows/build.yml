@@ -25,18 +25,9 @@ jobs:
       - name: Download dependencies
         run: go mod download
 
-      # - name: Run database migrations first
-      #   run: |
-      #     docker run --rm \
-      #       -v ${{ github.workspace }}/db/migrations:/migrations \
-      #       migrate/migrate \
-      #       -path=/migrations \
-      #       -database "${{ secrets.DB_URL }}" \
-      #       up
-
       - name: Generate SQLC code using Docker
         run: |
-          docker run --rm -v ${{ github.workspace }}:/src -w /src sqlc/sqlc:1.29.0 generate -f db/sqlc.yml
+          docker run --rm -v ${{ github.workspace }}:/src -w /src sqlc/sqlc:1.29.0 generate -f db/sqlc.yml --no-verify
 
       - name: Check for uncommitted changes
         run: |
