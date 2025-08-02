@@ -8,14 +8,14 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// DB encapsula a pool do pgx e os métodos gerados pelo sqlc.
 type DB struct {
 	Pool *pgxpool.Pool
 	*Queries
 }
 
 // NewDB cria uma nova conexão com o banco e retorna a estrutura DB.
-// A URL do banco deve ser passada via variável de ambiente DATABASE_URL.
+// A URL do banco deve ser passada via variável de ambiente DB_URL.
+// Para produção com Supabase, use a URL do pooler (PROD_DB_URL) para melhor performance.
 func NewDB(ctx context.Context) (*DB, error) {
 	dbURL := os.Getenv("DB_URL")
 	if dbURL == "" {
@@ -33,6 +33,8 @@ func NewDB(ctx context.Context) (*DB, error) {
 	}
 
 	queries := New(pool)
+
+	fmt.Printf("Conexão com o banco estabelecida com sucesso: %s\n", dbURL)
 
 	return &DB{
 		Pool:    pool,
